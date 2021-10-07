@@ -5,6 +5,7 @@ import ua.kovalev.exceptions.NoSuchStudentException;
 import ua.kovalev.exceptions.RemoveStudentException;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class Group {
     private int idGradeBookCounter;
@@ -129,28 +130,22 @@ public class Group {
         }
     }
 
-    public void sortBase(){
-        int indSorted = countStudents-1;
-        for (int i = 0; i < indSorted; i++) {
-            if (baseStudents[i].getSurname().compareTo(baseStudents[i+1].getSurname())>0){
-                Student student = baseStudents[i];
-                baseStudents[i] = baseStudents[i+1];
-                baseStudents[i+1] = student;
-            }
-            if(i==(indSorted-1)){
-                indSorted--;
-                i=-1;
-                continue;
-            }
-        }
-    }
-
     @Override
     public String toString() {
-        sortBase();
+        sortStudentsBySurname();
         return "Group{" +
                 "name='" + name + '\'' +
                 ", baseStudents=" + Arrays.toString(baseStudents) +
                 '}';
+    }
+
+    private void sortStudentsBySurname(){
+        Comparator sortBySurnameComparator = new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                return ((Student)o1).getSurname().compareTo(((Student)o2).getSurname());
+            }
+        };
+        Arrays.sort(baseStudents, Comparator.nullsLast(sortBySurnameComparator));
     }
 }
