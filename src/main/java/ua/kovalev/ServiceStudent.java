@@ -9,9 +9,8 @@ import java.io.InputStreamReader;
 
 public class ServiceStudent {
 
-    public static Student create() throws CreateStudentException {
+    public static Student create() throws CreateStudentException, IOException {
         Student student = new Student();
-        boolean studentWasCreated = false;
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             // -- фамилия -- //
             System.out.println("Создание студента. Чтобы выйти из режима создания введите exit");
@@ -78,7 +77,7 @@ public class ServiceStudent {
             }
         }
         catch(IOException ex){
-            System.out.println(ex);
+            throw ex;
         }
 
         return student;

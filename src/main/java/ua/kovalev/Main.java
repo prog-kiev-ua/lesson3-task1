@@ -5,6 +5,8 @@ import ua.kovalev.exceptions.CreateStudentException;
 import ua.kovalev.exceptions.NoSuchStudentException;
 import ua.kovalev.exceptions.RemoveStudentException;
 
+import java.io.IOException;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -25,6 +27,8 @@ public class Main {
             student7 = ServiceStudent.create();
         } catch (CreateStudentException e) {
             System.out.println(e.getMessage());
+        }catch (IOException e){
+            System.out.println(e);
         }
 
         System.out.println(student7);
