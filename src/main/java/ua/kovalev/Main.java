@@ -44,6 +44,10 @@ public class Main {
         } catch (AddStudentException e) {
             System.out.println(e.getMessage());
         }
+        String studentStr = student1.toCSVString();
+        System.out.println("------" + studentStr);
+        Student student9 = student1.fromCSVString(studentStr);
+        System.out.println(student9);
 
         try {
             group.removeStudent(student8.getIdGradeBook());
