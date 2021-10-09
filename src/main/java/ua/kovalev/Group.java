@@ -6,6 +6,7 @@ import ua.kovalev.exceptions.RemoveStudentException;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class Group {
     private int idGradeBookCounter;
@@ -26,7 +27,7 @@ public class Group {
     }
 
     public void addStudent(Student student) throws AddStudentException {
-        if (hasFreePlaces()==0){
+        if (hasFreePlaces() == 0) {
             throw new AddStudentException("Группа переполнена");
         }
         baseStudents[countStudents] = student;
@@ -35,12 +36,12 @@ public class Group {
     }
 
     public void removeStudent(int idGradeBook) throws RemoveStudentException {
-        if (hasFreePlaces()==this.baseStudents.length){
+        if (hasFreePlaces() == this.baseStudents.length) {
             throw new RemoveStudentException("Группа пустая");
         }
         Student findedStudent = null;
         for (int i = 0; i < countStudents; i++) {
-            if(baseStudents[i].getIdGradeBook() == idGradeBook && baseStudents[i].getGroupName().equals(name)){
+            if (baseStudents[i].getIdGradeBook() == idGradeBook && baseStudents[i].getGroupName().equals(name)) {
                 findedStudent = baseStudents[i];
                 baseStudents[i] = null;
                 removeData();
@@ -48,38 +49,38 @@ public class Group {
                 break;
             }
         }
-        if(findedStudent==null){
+        if (findedStudent == null) {
             throw new RemoveStudentException(String.format("Студент [%d] не найден\n", idGradeBook));
         }
         System.out.println("Студент удалён из группы: " + findedStudent.toString());
     }
 
-    public Student findStudent(String surname) throws NoSuchStudentException{
+    public Student findStudent(String surname) throws NoSuchStudentException {
         NoSuchStudentException noSuchStudentException = new NoSuchStudentException("Нет такого студента");
-        if(hasFreePlaces()==baseStudents.length)
+        if (hasFreePlaces() == baseStudents.length)
             throw noSuchStudentException;
         Student student = null;
         for (int i = 0; i < countStudents; i++) {
-            if(baseStudents[i].getSurname().equals(surname)){
-                 student = baseStudents[i];
-                 break;
+            if (baseStudents[i].getSurname().equals(surname)) {
+                student = baseStudents[i];
+                break;
             }
         }
-        if(student == null) throw noSuchStudentException;
+        if (student == null) throw noSuchStudentException;
         return student;
     }
 
-    public int hasFreePlaces(){
+    public int hasFreePlaces() {
         return this.baseStudents.length - this.countStudents;
     }
 
-    private void addData(Student student){
+    private void addData(Student student) {
         student.setGroupName(name);
         student.setIdGradeBook(++idGradeBookCounter);
         countStudents++;
     }
 
-    private void removeData(){
+    private void removeData() {
         countStudents--;
     }
 
@@ -115,12 +116,12 @@ public class Group {
         this.countStudents = countStudents;
     }
 
-    private void trimBase(){
-        if(hasFreePlaces()==baseStudents.length) return;
+    private void trimBase() {
+        if (hasFreePlaces() == baseStudents.length) return;
         for (int i = 0; i < baseStudents.length; i++) {
-            if(baseStudents[i] == null){
-                for (int j = i+1; j < baseStudents.length; j++) {
-                    if (baseStudents[j] != null){
+            if (baseStudents[i] == null) {
+                for (int j = i + 1; j < baseStudents.length; j++) {
+                    if (baseStudents[j] != null) {
                         baseStudents[i] = baseStudents[j];
                         baseStudents[j] = null;
                         break;
@@ -139,11 +140,11 @@ public class Group {
                 '}';
     }
 
-    private void sortStudentsBySurname(){
+    public void sortStudentsBySurname() {
         Comparator sortBySurnameComparator = new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
-                return ((Student)o1).getSurname().compareTo(((Student)o2).getSurname());
+                return ((Student) o1).getSurname().compareTo(((Student) o2).getSurname());
             }
         };
         Arrays.sort(baseStudents, Comparator.nullsLast(sortBySurnameComparator));

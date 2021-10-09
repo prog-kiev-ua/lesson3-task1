@@ -1,9 +1,5 @@
 package ua.kovalev;
 
-import sun.plugin.javascript.navig.Array;
-
-import java.util.Arrays;
-
 public class Student extends Person implements CSVConverter{
     private int idGradeBook;
     private String groupName;
@@ -54,7 +50,6 @@ public class Student extends Person implements CSVConverter{
     @Override
     public Student fromCSVString(String str) {
         String [] array = str.split(";");
-        System.out.println(Arrays.toString(array));
-        return new Student(array[0], array[1], new Integer(array[2]), Sex.valueOf(array[3]), new Integer(array[5]), array[4]);
+        return new Student(array[1], array[0], new Integer(array[2]), Sex.valueOf(array[3]), new Integer(array[5]), array[4]);
     }
 }
