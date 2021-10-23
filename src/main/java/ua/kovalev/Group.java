@@ -6,7 +6,6 @@ import ua.kovalev.exceptions.RemoveStudentException;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Objects;
 
 public class Group {
     private int idGradeBookCounter;
@@ -148,5 +147,72 @@ public class Group {
             }
         };
         Arrays.sort(baseStudents, Comparator.nullsLast(sortBySurnameComparator));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o == null) return false;
+        if (!o.getClass().equals(getClass()))
+            return false;
+
+        Group other = (Group) o;
+        if (other.idGradeBookCounter != idGradeBookCounter || other.countStudents != countStudents) {
+            return false;
+        }
+
+        if (other.name == null) {
+            if (name != null)
+                return false;
+        } else if (name == null)
+            return false;
+        else if (!other.name.equals(name))
+            return false;
+
+        if (other.baseStudents == null) {
+            if (baseStudents != null) {
+                return false;
+            } else if (baseStudents == null)
+                return false;
+            else if (!Arrays.equals(other.baseStudents, baseStudents)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int number = 31;
+        int result = 1;
+        result = number * result + idGradeBookCounter;
+        result = number * result + countStudents;
+        result = number * result + ((name != null) ? name.hashCode() : 0);
+        result = number * result + ((baseStudents != null) ? Arrays.hashCode(baseStudents) : 0);
+        return result;
+    }
+
+    public void showEqStudents() {
+        Student arrayCopy[] = Arrays.copyOfRange(baseStudents, 0, countStudents);
+        boolean globalFinded = false;
+        for (int i = 0; i < arrayCopy.length; i++) {
+            if (arrayCopy[i] == null) continue;
+            boolean finded = false;
+            for (int j = i + 1; j < arrayCopy.length - 1; j++) {
+                if (arrayCopy[j + 1] == null) continue;
+                if (arrayCopy[i].equals(arrayCopy[j])) {
+                    finded = true;
+                    arrayCopy[j] = null;
+                }
+            }
+            if (finded) {
+                System.out.println(String.format("студент [%s] не уникальный в базе", arrayCopy[i]));
+                arrayCopy[i] = null;
+                globalFinded = true;
+            }
+        }
+        if (!globalFinded)
+            System.out.println("Все студенты в базе уникальные");
     }
 }

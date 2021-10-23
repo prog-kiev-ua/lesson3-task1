@@ -1,6 +1,6 @@
 package ua.kovalev;
 
-public class Student extends Person implements CSVConverter{
+public class Student extends Person implements CSVConverter {
     private int idGradeBook;
     private String groupName;
 
@@ -49,7 +49,46 @@ public class Student extends Person implements CSVConverter{
 
     @Override
     public Student fromCSVString(String str) {
-        String [] array = str.split(";");
+        String[] array = str.split(";");
         return new Student(array[1], array[0], new Integer(array[2]), Sex.valueOf(array[3]), new Integer(array[5]), array[4]);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o == null) return false;
+
+        if (!getClass().equals(o.getClass())) {
+            return false;
+        }
+
+        Student other = (Student) o;
+
+        if (other.idGradeBook != idGradeBook) {
+            return false;
+        }
+
+        if (groupName == null) {
+            if (other.groupName == null) {
+                return false;
+            }
+        } else if (other.groupName == null)
+            return false;
+        else if (!groupName.equals(other.groupName))
+            return false;
+
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        final int number = 31;
+        int result = 1;
+
+        result = number * result + idGradeBook;
+        result = number * result + ((groupName != null) ? groupName.hashCode() : 0);
+        result = number * result + super.hashCode();
+
+        return result;
     }
 }

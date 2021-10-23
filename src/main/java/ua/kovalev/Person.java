@@ -57,4 +57,53 @@ public class Person {
                 ", age=" + age +
                 ", sex=" + sex.getDescription();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!o.getClass().equals(getClass()))
+            return false;
+
+        Person person = (Person) o;
+
+        if (person.name == null) {
+            if (name != null)
+                return false;
+        } else if (name == null)
+            return false;
+        else if (!person.name.equals(name))
+            return false;
+
+        if (person.surname == null) {
+            if (surname != null)
+                return false;
+        } else if (surname == null)
+            return false;
+        else if (!person.surname.equals(surname))
+            return false;
+
+        if (person.sex == null) {
+            if (sex != null)
+                return false;
+        } else if (sex == null)
+            return false;
+        else if (person.sex != sex)
+            return false;
+
+        if (person.age != age) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int number = 31;
+        int result = 1;
+        result = number * result + ((name != null) ? name.hashCode() : 0);
+        result = number * result + ((surname != null) ? surname.hashCode() : 0);
+        result = number * result + ((sex != null) ? sex.hashCode() : 0);
+        result = number * result + age;
+        return result;
+    }
 }
