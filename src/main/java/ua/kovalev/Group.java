@@ -4,14 +4,13 @@ import ua.kovalev.exceptions.AddStudentException;
 import ua.kovalev.exceptions.NoSuchStudentException;
 import ua.kovalev.exceptions.RemoveStudentException;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 public class Group {
     private int idGradeBookCounter;
     private String name;
-    private Student[] baseStudents;
-    private int countStudents;
+    private int maxStudents;
+    private List<Student> listStudents;
 
     public Group() {
         super();
@@ -21,66 +20,47 @@ public class Group {
         super();
         this.name = name;
         this.idGradeBookCounter = 0;
-        this.countStudents = 0;
-        this.baseStudents = new Student[10];
+        this.maxStudents = 10;
+        listStudents = new ArrayList<>();
     }
 
     public void addStudent(Student student) throws AddStudentException {
-        if (hasFreePlaces() == 0) {
-            throw new AddStudentException("Группа переполнена");
+        if (listStudents.size() == maxStudents) {
+            throw new AddStudentException("Группа заполнена");
         }
-        baseStudents[countStudents] = student;
+        listStudents.add(student);
         addData(student);
         System.out.println("Студент добавлен в группу: " + student);
     }
 
     public void removeStudent(int idGradeBook) throws RemoveStudentException {
-        if (hasFreePlaces() == this.baseStudents.length) {
+        if (listStudents.isEmpty()) {
             throw new RemoveStudentException("Группа пустая");
         }
-        Student findedStudent = null;
-        for (int i = 0; i < countStudents; i++) {
-            if (baseStudents[i].getIdGradeBook() == idGradeBook && baseStudents[i].getGroupName().equals(name)) {
-                findedStudent = baseStudents[i];
-                baseStudents[i] = null;
-                removeData();
-                trimBase();
-                break;
-            }
-        }
-        if (findedStudent == null) {
+
+        Optional<Student> student = listStudents.stream().filter(s -> s.getIdGradeBook() == idGradeBook && s.getGroupName().equals(name)).findFirst();
+        if (student.isPresent()) {
+            listStudents.remove(student.get());
+            System.out.println("Студент удалён из группы: " + student.get());
+        } else {
             throw new RemoveStudentException(String.format("Студент [%d] не найден\n", idGradeBook));
         }
-        System.out.println("Студент удалён из группы: " + findedStudent.toString());
     }
 
     public Student findStudent(String surname) throws NoSuchStudentException {
         NoSuchStudentException noSuchStudentException = new NoSuchStudentException("Нет такого студента");
-        if (hasFreePlaces() == baseStudents.length)
+        if (listStudents.isEmpty()) {
             throw noSuchStudentException;
-        Student student = null;
-        for (int i = 0; i < countStudents; i++) {
-            if (baseStudents[i].getSurname().equals(surname)) {
-                student = baseStudents[i];
-                break;
-            }
         }
-        if (student == null) throw noSuchStudentException;
-        return student;
-    }
 
-    public int hasFreePlaces() {
-        return this.baseStudents.length - this.countStudents;
+        Optional<Student> student = listStudents.stream().filter(s -> s.getSurname().equals(surname)).findFirst();
+        if (!student.isPresent()) throw noSuchStudentException;
+        return student.get();
     }
 
     private void addData(Student student) {
         student.setGroupName(name);
         student.setIdGradeBook(++idGradeBookCounter);
-        countStudents++;
-    }
-
-    private void removeData() {
-        countStudents--;
     }
 
     public int getIdGradeBookCounter() {
@@ -99,43 +79,12 @@ public class Group {
         this.name = name;
     }
 
-    public Student[] getBaseStudents() {
-        return baseStudents;
-    }
-
-    public void setBaseStudents(Student[] baseStudents) {
-        this.baseStudents = baseStudents;
-    }
-
-    public int getCountStudents() {
-        return countStudents;
-    }
-
-    public void setCountStudents(int countStudents) {
-        this.countStudents = countStudents;
-    }
-
-    private void trimBase() {
-        if (hasFreePlaces() == baseStudents.length) return;
-        for (int i = 0; i < baseStudents.length; i++) {
-            if (baseStudents[i] == null) {
-                for (int j = i + 1; j < baseStudents.length; j++) {
-                    if (baseStudents[j] != null) {
-                        baseStudents[i] = baseStudents[j];
-                        baseStudents[j] = null;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public String toString() {
         sortStudentsBySurname();
         return "Group{" +
                 "name='" + name + '\'' +
-                ", baseStudents=" + Arrays.toString(baseStudents) +
+                ", listStudents=" + listStudents +
                 '}';
     }
 
@@ -146,7 +95,7 @@ public class Group {
                 return ((Student) o1).getSurname().compareTo(((Student) o2).getSurname());
             }
         };
-        Arrays.sort(baseStudents, Comparator.nullsLast(sortBySurnameComparator));
+        Collections.sort(listStudents, sortBySurnameComparator);
     }
 
     @Override
@@ -157,7 +106,7 @@ public class Group {
             return false;
 
         Group other = (Group) o;
-        if (other.idGradeBookCounter != idGradeBookCounter || other.countStudents != countStudents) {
+        if (other.idGradeBookCounter != idGradeBookCounter) {
             return false;
         }
 
@@ -169,14 +118,13 @@ public class Group {
         else if (!other.name.equals(name))
             return false;
 
-        if (other.baseStudents == null) {
-            if (baseStudents != null) {
+        if (other.listStudents == null) {
+            if (listStudents != null)
                 return false;
-            } else if (baseStudents == null)
-                return false;
-            else if (!Arrays.equals(other.baseStudents, baseStudents)) {
-                return false;
-            }
+        } else if (listStudents == null)
+            return false;
+        else if (!listStudents.equals(other.listStudents)) {
+            return false;
         }
 
         return true;
@@ -187,32 +135,46 @@ public class Group {
         final int number = 31;
         int result = 1;
         result = number * result + idGradeBookCounter;
-        result = number * result + countStudents;
         result = number * result + ((name != null) ? name.hashCode() : 0);
-        result = number * result + ((baseStudents != null) ? Arrays.hashCode(baseStudents) : 0);
+        result = number * result + ((listStudents != null) ? listStudents.hashCode() : 0);
         return result;
     }
 
     public void showEqStudents() {
-        Student arrayCopy[] = Arrays.copyOfRange(baseStudents, 0, countStudents);
+        List<Student> listFinded = new ArrayList<>();
         boolean globalFinded = false;
-        for (int i = 0; i < arrayCopy.length; i++) {
-            if (arrayCopy[i] == null) continue;
-            boolean finded = false;
-            for (int j = i + 1; j < arrayCopy.length - 1; j++) {
-                if (arrayCopy[j + 1] == null) continue;
-                if (arrayCopy[i].equals(arrayCopy[j])) {
-                    finded = true;
-                    arrayCopy[j] = null;
+
+        for (int i = 0; i < listStudents.size(); i++) {
+            for (int j = i + 1; j < listStudents.size(); j++) {
+                if (listStudents.get(i).equals(listStudents.get(j))){
+                    if(!listFinded.contains(listStudents.get(i))){
+                        System.out.println(String.format("студент [%s] не уникальный в базе", listStudents.get(i)));
+                        listFinded.add(listStudents.get(i));
+                    }
+                    globalFinded = true;
+                    break;
                 }
             }
-            if (finded) {
-                System.out.println(String.format("студент [%s] не уникальный в базе", arrayCopy[i]));
-                arrayCopy[i] = null;
-                globalFinded = true;
-            }
         }
+
         if (!globalFinded)
             System.out.println("Все студенты в базе уникальные");
+
+    }
+
+    public int getMaxStudents() {
+        return maxStudents;
+    }
+
+    public void setMaxStudents(int maxStudents) {
+        this.maxStudents = maxStudents;
+    }
+
+    public List<Student> getListStudents() {
+        return listStudents;
+    }
+
+    public void setListStudents(List<Student> listStudents) {
+        this.listStudents = listStudents;
     }
 }

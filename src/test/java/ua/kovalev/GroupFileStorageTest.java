@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -113,14 +114,13 @@ class GroupFileStorageTest {
             groupLoaded.sortStudentsBySurname();
 
             assertTrue(groupLoaded.getIdGradeBookCounter() == groupExpected.getIdGradeBookCounter() &&
-                    groupExpected.getCountStudents() == groupLoaded.getCountStudents() &&
                     groupExpected.getName().equals(groupLoaded.getName()));
 
-            Student[] studentsExpected = groupExpected.getBaseStudents();
-            Student[] studentsLoaded = groupLoaded.getBaseStudents();
+            List<Student> studentsExpected = groupExpected.getListStudents();
+            List<Student> studentsLoaded = groupLoaded.getListStudents();
 
-            for (int i = 0; i < groupExpected.getCountStudents(); i++) {
-                assertTrue(studentsExpected[i].toCSVString().equals(studentsLoaded[i].toCSVString()));
+            for (int i = 0; i < studentsExpected.size(); i++) {
+                assertTrue(studentsExpected.get(i).toCSVString().equals(studentsLoaded.get(i).toCSVString()));
             }
 
 

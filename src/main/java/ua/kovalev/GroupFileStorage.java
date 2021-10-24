@@ -30,12 +30,11 @@ public class GroupFileStorage {
             throw new IOException("Ошибка создания файла");
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new PrintWriter(file))) {
-            Student[] students = group.getBaseStudents();
-            for (int i = 0; i < group.getCountStudents(); i++) {
-                bufferedWriter.write(students[i].toCSVString());
-                // если есть следующий элемент делаю перенос строки
-                if (i < (group.getCountStudents() - 1))
+            boolean first = true;
+            for (Student student : group.getListStudents()) {
+                if(!first)
                     bufferedWriter.newLine();
+                bufferedWriter.write(student.toCSVString());
             }
         }
     }
